@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 class KhipuController extends Controller
 {
 
-
+ 
 
 
     public function index()
@@ -20,13 +20,14 @@ class KhipuController extends Controller
 
 
 
-    public function obtenerBancos()
+    public function getBanks()
     {
+        $apiKey = env('KHIPU_API_KEY');
         $curl = curl_init();
 
         curl_setopt_array($curl, [
             CURLOPT_HTTPHEADER => [
-                "x-api-key: b8fc13d0-b4d6-4e49-8af9-7ed7704c2de4"
+                "x-api-key: {$apiKey}"
             ],
             CURLOPT_URL => "https://payment-api.khipu.com/v3/banks",
             CURLOPT_RETURNTRANSFER => true,
@@ -55,12 +56,22 @@ class KhipuController extends Controller
 
 
 
-    public function crearCobro()
+
+
+
+    public function createPayment(Request $request)
     {
-        $apiKey = 'b8fc13d0-b4d6-4e49-8af9-7ed7704c2de4'; // Tu API key
+
+
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        $apiKey = env('KHIPU_API_KEY');
+        $amount = (int) $request->input('amount');
 
         $payload = [
-            "amount" => 1000,
+            "amount" => $amount,
             "currency" => "CLP",
             "subject" => "Cobro de prueba desde Laravel"
         ];
@@ -72,7 +83,9 @@ class KhipuController extends Controller
 
         if ($response->successful()) {
             $resultado = $response->json();
-            return redirect($resultado['payment_url']); // Te redirige al pago
+            return view('pago', [
+                'payment_id' => $resultado['payment_id']
+            ]);
         } else {
             return response()->json([
                 'error' => $response->body()
@@ -83,4 +96,46 @@ class KhipuController extends Controller
 
 
 
+
+
+
+
+    public function getPaymentById($id)
+    {
+        $apiKey = env('KHIPU_API_KEY');
+
+        $response = Http::withHeaders([
+            'x-api-key' => $apiKey
+        ])->get("https://payment-api.khipu.com/v3/payments/{$id}");
+
+        if ($response->successful()) {
+            $pago = $response->json();
+            return view('estado-pago', ['pago' => $pago]);
+        } else {
+            return view('khipu', ['error' => 'Error al obtener el estado del pago: ' . $response->body()]);
+        }
+    }
+
+
+
+
+    public function deletePaymentById($id)
+    {
+        $apiKey = env('KHIPU_API_KEY');
+
+        $response = Http::withHeaders([
+            'x-api-key' => $apiKey
+        ])->delete("https://payment-api.khipu.com/v3/payments/{$id}");
+
+        if ($response->successful()) {
+            return redirect('/')->with('success', 'Pago eliminado correctamente.');
+        } else {
+            return redirect('/')->withErrors(['error' => 'Error al eliminar el pago: ' . $response->body()]);
+        }
+    }
+
+
+
+
 }
+
