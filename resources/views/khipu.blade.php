@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Bienvenido a la integración Khipu por Daniel Alejandro BG</h1>
+        <h1>Bienvenido a la integración Khipu</h1>
 
         <p>
             <a href="{{ url('/bancos') }}">Obtener lista de bancos</a>
@@ -34,7 +34,7 @@
 
 
 
-
+        <br><br>
         <h2>Generar cobro de prueba</h2>
         <form action="{{ url('/crear-pago') }}" method="POST">
             @csrf
@@ -43,20 +43,20 @@
             <button type="submit">Generar cobro</button>
         </form>
 
-
+        <br><br><br>
         <h2>Consultar estado de un pago</h2>
         <form action="{{ url('/estado-pago') }}" method="GET">
-            <label for="payment_id">ID del pago:</label>
+            <label for="payment_id">ID del pago (sin guiones):</label>
             <input type="text" name="payment_id" id="payment_id" required>
             <button type="submit">Consultar estado</button>
         </form>
 
-
+        <br><br><br>
         <h2>Eliminar un pago</h2>
         <form action="{{ route('eliminar.pago', ['id' => 'temp']) }}" method="POST" onsubmit="this.action=this.action.replace('temp', document.getElementById('payment_id_delete').value)">
             @csrf
             @method('DELETE')
-            <label for="payment_id_delete">ID del pago:</label>
+            <label for="payment_id_delete">ID del pago (sin guiones):</label>
             <input type="text" name="payment_id_delete" id="payment_id_delete" required>
             <button type="submit">Eliminar pago</button>
         </form>

@@ -73,7 +73,8 @@ class KhipuController extends Controller
         $payload = [
             "amount" => $amount,
             "currency" => "CLP",
-            "subject" => "Cobro de prueba desde Laravel"
+            "subject" => "Cobro de prueba desde Laravel",
+            "return_url" => "http://127.0.0.1:8000"
         ];
 
         $response = Http::withHeaders([
